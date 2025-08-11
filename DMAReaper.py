@@ -20,7 +20,7 @@ ACPI20_GUID = bytes([
 
 PAGE_SIZE = 0x1000
 RAM_SIZE = 64 * 1024 * 1024 * 1024  # 64 GB
-DEFAULT_START_ADDR = 0x52000000
+DEFAULT_START_ADDR = 0x10000000
 BATCH_SIZE = 100
 EFI_SIG = b'IBI SYST'  # EFI System Table signature (little endian)
 
@@ -242,4 +242,5 @@ def main():
     killDMARACPI(dmar_ptr)
 
 if __name__ == "__main__":
+
     main()
