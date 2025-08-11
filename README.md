@@ -1,8 +1,5 @@
 # Disable Kernel DMA Protection from pre-boot
-This program is used to control an FPGA board running the [PCILeech firmware](https://github.com/ufrisk/pcileech). DMAReaper will automatically seek and destroy the DMAR ACPI table on the target computer using pre-boot DMA attack. When successful, this operation will prevent usage of the IOMMU and subsequent initialization of Kernel DMA Protection when Windows Boots. This program is suitable for disabling Kernel DMA Protection on windows 10 or windows 11 even when target firmware has Secure Boot, VT-d, VT-x, Sure Start, Virtualization based BIOS Security, and Enhanced Firmware runtime Intrusion and Detection Enabled.
-
-# Demo
-![](https://github.com/PN-Tester/DMAReaper/blob/2a0f5cdcce1da18f09b60f20b35fe0b9d1db9984/DMAReaper.jpg)
+This program is used to control an FPGA board running the [PCILeech firmware](https://github.com/ufrisk/pcileech). DMAReaper will automatically seek and destroy the DMAR ACPI table on the target computer via pre-boot DMA attack against UEFI. When successful, this operation will prevent usage of the IOMMU and subsequent initialization of Kernel DMA Protection when Windows Boots. This program is suitable for disabling Kernel DMA Protection on windows 10 or windows 11 even when target firmware has Secure Boot, VT-d, VT-x, Sure Start, Virtualization based BIOS Security, and Enhanced Firmware runtime Intrusion and Detection Enabled. This method will not trigger BitLocker recovery on auto-booting Windows with TPM BitLocker key protector.
 
 # Usage
 ```
@@ -23,13 +20,18 @@ options:
 
 The only value you might need to change out of the box is MIN_ADDR. You may want to put something lower than 0x52000000. Try starting at 0x30000000.
 
+# Demo
+![](https://github.com/PN-Tester/DMAReaper/blob/2a0f5cdcce1da18f09b60f20b35fe0b9d1db9984/DMAReaper.jpg)
+
 # Preparation
 1. Connect the FPGA board to the target computer via appropriate PCI Express port (M.2 / ExpressCard / Mini PCIe)
 2. Connect the FPGA board to the attack computer via the data port (USB-C)
 3. Power on the target computer
 4. Quickly power on the board to ensure proper initialization
 5. Enter UEFI on the target computer
-6. You may need to repeat steps 3-5 several times before you get a valid PCIe Link. Timing is key. 
+6. You may need to repeat steps 3-5 several times before you get a valid PCIe Link. Timing is key.
+7. Once valid PCIe Link is established, run the DMAReaper.py program from attack computer and wait for success message.
+8. Upon completion, select "Continue Boot" or equivalent on target computer to boot into Windows with Kernel DMA Protection disabled.
 
 # Explanation
 
