@@ -13,7 +13,7 @@ options:
   -i INTENSITY, --intensity INTENSITY
                         Number of times each memory segment is read during scan. Lower is faster but less reliable. (default: 3)
   -min MIN_ADDR, --min-addr MIN_ADDR
-                        Minimum scan address (default: 0x52000000)
+                        Minimum scan address (default: 0x10000000)
   -max MAX_ADDR, --max-addr MAX_ADDR
                         Maximum scan address (default: 0xFFFFFFFF)
 ```
