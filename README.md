@@ -26,7 +26,7 @@ The only value you might need to change out of the box is MIN_ADDR. You may want
 3. Power on the target computer
 4. Quickly power on the board to ensure proper initialization
 5. Enter UEFI on the target computer
-6. You may need to repeat steps 3-5 several times before you get a valid connection. Timing is key
+6. You may need to repeat steps 3-5 several times before you get a valid PCIe Link. Timing is key. 
 
 # Explanation
 
