@@ -1,5 +1,5 @@
 # Disable Kernel DMA Protection from pre-boot
-This program is used to control an FPGA board running the [PCILeech firmware](https://github.com/ufrisk/pcileech). DMAReaper will automatically seek and destroy the DMAR ACPI table on the target computer using pre-boot DMA attack. When successful, this operation will prevent usage of the IOMMU and subsequent intialization of Kernel DMA Protection when Windows Boots. This program is suitable for disabling Kernel DMA Protection when target firmware has Secure Boot, VT-d, VT-x, Sure Start, Virtualization based BIOS Security, and Enhanced Firmware runtime Intrusion and Detection Enabled.
+This program is used to control an FPGA board running the [PCILeech firmware](https://github.com/ufrisk/pcileech). DMAReaper will automatically seek and destroy the DMAR ACPI table on the target computer using pre-boot DMA attack. When successful, this operation will prevent usage of the IOMMU and subsequent intialization of Kernel DMA Protection when Windows Boots. This program is suitable for disabling Kernel DMA Protection on windows 10 or windows 11 even when target firmware has Secure Boot, VT-d, VT-x, Sure Start, Virtualization based BIOS Security, and Enhanced Firmware runtime Intrusion and Detection Enabled.
 
 # Usage
 ```
