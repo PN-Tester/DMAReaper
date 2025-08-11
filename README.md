@@ -18,7 +18,7 @@ options:
                         Maximum scan address (default: 0xFFFFFFFF)
 ```
 
-The only value you might need to change out of the box is MIN_ADDR. You may want to put something lower than 0x52000000. Try starting at 0x30000000.
+The only value you might need to change out of the box is MIN_ADDR. 
 
 # Demo
 ![](https://github.com/PN-Tester/DMAReaper/blob/cd4b1fe68e02f6d773cf5fafe8398cfb24a1e645/demo.jpg)
