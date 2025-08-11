@@ -21,7 +21,7 @@ options:
 The only value you might need to change out of the box is MIN_ADDR. You may want to put something lower than 0x52000000. Try starting at 0x30000000.
 
 # Demo
-![](https://github.com/PN-Tester/DMAReaper/blob/2a0f5cdcce1da18f09b60f20b35fe0b9d1db9984/DMAReaper.jpg)
+![](https://github.com/PN-Tester/DMAReaper/blob/cd4b1fe68e02f6d773cf5fafe8398cfb24a1e645/demo.jpg)
 
 # Preparation
 1. Connect the FPGA board to the target computer via appropriate PCI Express port (M.2 / ExpressCard / Mini PCIe)
