@@ -208,6 +208,7 @@ def find_dmar_from_rsdp(rsdp_addr: int):
         if sig_str == 'DMAR':
             print(f"[+] DMAR table found at 0x{subtable_ptr:016x}")
             return subtable_ptr
+        # Unconfirmed IVRS kill logic for for AMD support
         if sig_str == 'IVRS':
             print(f"[+] IVRS table found at 0x{subtable_ptr:016x}")
             return subtable_ptr
@@ -259,4 +260,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
